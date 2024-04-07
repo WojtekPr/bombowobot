@@ -5,6 +5,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import random
 import time
+from selenium.common.exceptions import TimeoutException
 
 class bombowobot():
     def __init__(self):
@@ -43,31 +44,65 @@ class bombowobot():
 
     
     def szukanie_lobby(self):
-            wait = WebDriverWait(self.driver, 10, poll_frequency=0.5)
-            previous_text = None
-            
-            while True:
+        wait = WebDriverWait(self.driver, 10)
+        previous_text = None
+        
+        while True:
+            try:
                 # Znajdź element z tekstem na stronie
-                element = wait.until(EC.visibility_of_element_located((By.XPATH, '/html/body/div/div[3]/div[1]/div[2]/p')))
+                xpath = '/html/body/div/div[3]/div[1]/div[2]'
+                element = wait.until(EC.visibility_of_element_located((By.XPATH, xpath)))
                 current_text = element.text
                 
                 # Sprawdź czy tekst się zmienił
                 if current_text != previous_text:
-                    print('Tekst się zmienił:', current_text)
+                    print('INFO:', current_text)
                     previous_text = current_text
-                else:
-                    print('Tekst nie zmienił się:', current_text)
                 
                 # Tutaj możesz umieścić dodatkowe warunki przerwania pętli
                 # np. jeśli warunek został spełniony
                 if current_text == 'Jakiś inny tekst':
                     break
+                    
+                time.sleep(0.5)
+                
+            except TimeoutException as e:
+                # Obsługa wyjątku, gdy element nie jest widoczny w określonym czasie
+                print("TimeoutException: Element nie został znaleziony w czasie oczekiwania. Szukany xpath:", xpath)
+                print(e)
+                break
+                
+        self.script()
         
-                time.sleep(0.5) 
+
+
+
+    def script(self):
+        wait = WebDriverWait(self.driver, 10)
+        my_nickname = self.nickname_generator()  # Pobranie wygenerowanego pseudonimu
+        sylaba = self.driver.find_element('xpath','/html/body/div/div[3]/div[3]/div[3]/div[1]/p')
+        wpisz = self.driver.find_element('xpath','/html/body/div[1]/div[3]/div[4]/form/input')
+        
+        
+        while True:
+            wpisz.send_keys("test")
+            # # Sprawdzamy czy element z pseudonimem jest widoczny na stronie
+            # nickname = wait.until(EC.visibility_of_element_located((By.XPATH, '/html/body/div/div[3]/div[3]/div[3]/div[3]')))
+            # current_nick = nickname.text
+
+            # if current_nick == my_nickname:
+            #     print('twoj nick jest na ekranie')
+            # else:
+            #     print('twojego nicku nie ma na ekranie')
+            
+            time.sleep(0.5)
+
+
+
 
     def nickname_generator(self):
-        nicknames = ["Anna", "Maria", "Katarzyna", "Małgorzata", "Agnieszka",
-                     "Joanna", "Marta", "Dorota", "Ewa", "Magdalena",
+        nicknames = ["Anna", "Maria", "Katarzyna", "Gosia", "Agnieszka",
+                     "Joanna", "Marta", "Dorota", "Ewaaaa", "Magdalena",
                      "Aleksandra", "Monika", "Barbara", "Justyna", "Kinga",
                      "Natalia", "Beata", "Karolina", "Weronika", "Izabela"]
         
